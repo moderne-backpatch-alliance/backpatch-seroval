@@ -23,9 +23,14 @@ import {
 import type { PluginAccessOptions } from '../plugin';
 import { SerovalMode } from '../plugin';
 import { getReference } from '../reference';
-import { createSequence, type Sequence, sequenceToIterator } from '../sequence';
+import {
+  createSequence,
+  isSequence,
+  type Sequence,
+  sequenceToIterator,
+} from '../sequence';
 import type { Stream } from '../stream';
-import { createStream, streamToAsyncIterable } from '../stream';
+import { createStream, isStream, streamToAsyncIterable } from '../stream';
 import { deserializeString } from '../string';
 import type {
   SerovalAggregateErrorNode,
@@ -631,7 +636,13 @@ function deserializeIteratorFactoryInstance(
 ): unknown {
   deserialize(ctx, depth, node.a[0]);
   const source = deserialize(ctx, depth, node.a[1]);
-  return sequenceToIterator(source as Sequence);
+  // `node.a[1]` is any node the input picked. Check the value itself rather
+  // than the type recorded for its id: in vanilla mode an unmarked id can be
+  // reused, so a plain object could sit behind an id marked as a Sequence.
+  if (!isSequence(source)) {
+    throw new SerovalMalformedNodeError(node.a[1]);
+  }
+  return sequenceToIterator(source);
 }
 
 function deserializeAsyncIteratorFactoryInstance(
@@ -641,7 +652,14 @@ function deserializeAsyncIteratorFactoryInstance(
 ): unknown {
   deserialize(ctx, depth, node.a[0]);
   const source = deserialize(ctx, depth, node.a[1]);
-  return streamToAsyncIterable(source as Stream<any>);
+  // `node.a[1]` is any node the input picked. Check the value itself rather
+  // than the type recorded for its id: in vanilla mode an unmarked id can be
+  // reused, so another value could sit behind an id marked as a stream. This
+  // stops a fake stream from having its `on` invoked below.
+  if (!isStream(source)) {
+    throw new SerovalMalformedNodeError(node.a[1]);
+  }
+  return streamToAsyncIterable(source);
 }
 
 function deserializeStreamConstructor(
