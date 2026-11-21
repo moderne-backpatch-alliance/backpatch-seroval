@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 1.5.7-backpatch-00001
+release: 1.5.7-backpatch-00002
 baseline: v1.5.6+backpatch.baseline
 fixes:
   - cve: CVE-2026-104845
@@ -10,12 +10,20 @@ fixes:
     basis: backport
     artifacts:
       - seroval
-    note: "New in this release; upstream's fix in 1.6.4. It closes the advisory: Seroval: Memory exhaustion via unchecked TypedArray length in JSON deserialization."
+    note: "Carried from 1.5.7-backpatch-00001; upstream's fix in 1.6.4. It closes the advisory: Seroval: Memory exhaustion via unchecked TypedArray length in JSON deserialization."
+  - cve: CVE-2026-104846
+    upstream_fix_url: https://github.com/lxsmnsyc/seroval/commit/f1ffcc96d259f9b5b3d71feb262b58240c90e7b7
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2026-104846
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-seroval/compare/8241bf2~1...c318e7c
+    basis: backport
+    artifacts:
+      - seroval
+    note: "New in this release; upstream's fix in 1.6.4 (f1ffcc9, 5d3eb6b). It closes the advisory: Seroval: `fromJSON()` Promise thenable assimilation invokes plugin-produced callables (bypass of GHSA-mv8w-475r-vwqw)."
 tests:
-  commit: 0e40bd577b383c3f970f3a1ee4edd7d11c627c47
+  commit: c318e7cd545575c951cc9a15b5a63a1cfde3086b
   command: the verify run's pnpm 9.15.9 install --ignore-scripts --filter seroval at the tag, in packages/seroval pridepack clean and pridepack build, npm pack --ignore-scripts, then each of the tested commit's packages/seroval/test/**/*.test.ts run alone under vitest (coverage off, 90 s alarm), each test recorded into the JUnit report
   runtime: Node.js v22.23.2, pnpm 9.15.9, npm 10.9.8, vitest 4.0.6, macOS 27.2 arm64
-  report: seroval-1.5.7-backpatch-00001-tests.zip
-  report_sha256: 6ff0827ba7d247e9e6c9777ff369e7253927df9636ff3e06c3c8b1178d0a09f3
+  report: seroval-1.5.7-backpatch-00002-tests.zip
+  report_sha256: 368819f4f1c563b6550ac6077fea474ee51c1b3bc9f243dd68e6b78693cb1161
   result: pass
-  note: "upstream's vitest tests of packages/seroval (test/**/*.test.ts, coverage off), each file run alone on the tested commit's source at the tested commit: 688 tests, 688 passed, 0 failed, 0 skipped. npmjs's 1.5.6 does not rebuild byte for byte from its tag with this toolchain: the tag's own rebuild already differs in the development bundles and their maps (one extra comment line), dist/types/core/constructors.d.ts and two .d.ts.map files (TypeScript output differences), and package.json (npmjs's has its fields reordered and no prepublishOnly script); the production bundles are identical. The CVE tests (packages/seroval/test/typed-array-limit.test.ts), with this release's production lines reverted at the tested commit: 5 tests, 2 passed, 3 failed, 0 skipped, test files exiting non-zero: packages/seroval/test/typed-array-limit.test.ts; with them: 5 tests, 5 passed, 0 failed, 0 skipped. Built with pridepack build in packages/seroval in a directory named seroval, 98 of npmjs's 111 files for 1.5.6 are identical; the rest are dist/cjs/development/index.cjs, dist/cjs/development/index.cjs.map, dist/cjs/production/index.cjs, dist/esm/development/index.mjs, dist/esm/development/index.mjs.map, dist/esm/production/index.mjs, dist/types/core/base-primitives.d.ts.map, dist/types/core/constructors.d.ts, dist/types/core/constructors.d.ts.map, dist/types/core/opaque-reference.d.ts.map, package.json, src/core/base-primitives.ts, src/core/context/deserializer.ts. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
+  note: "upstream's vitest tests of packages/seroval (test/**/*.test.ts, coverage off), each file run alone on the tested commit's source at the tested commit: 690 tests, 690 passed, 0 failed, 0 skipped. npmjs's 1.5.6 does not rebuild byte for byte from its tag with this toolchain: the tag's own rebuild already differs in the development bundles and their maps (one extra comment line), dist/types/core/constructors.d.ts and two .d.ts.map files (TypeScript output differences), and package.json (npmjs's has its fields reordered and no prepublishOnly script); the production bundles are identical. The CVE tests (packages/seroval/test/thenable.test.ts), with this release's production lines reverted at the tested commit: 2 tests, 0 passed, 2 failed, 0 skipped, test files exiting non-zero: packages/seroval/test/thenable.test.ts; with them: 2 tests, 2 passed, 0 failed, 0 skipped. Built with pridepack build in packages/seroval in a directory named seroval, 97 of npmjs's 111 files for 1.5.6 are identical; the rest are dist/cjs/development/index.cjs, dist/cjs/development/index.cjs.map, dist/cjs/production/index.cjs, dist/esm/development/index.mjs, dist/esm/development/index.mjs.map, dist/esm/production/index.mjs, dist/types/core/base-primitives.d.ts.map, dist/types/core/constructors.d.ts, dist/types/core/constructors.d.ts.map, dist/types/core/context/deserializer.d.ts.map, dist/types/core/opaque-reference.d.ts.map, package.json, src/core/base-primitives.ts, src/core/context/deserializer.ts. The archive's file-origins.yaml maps each packaged file to the commit, or names its inputs and build."
